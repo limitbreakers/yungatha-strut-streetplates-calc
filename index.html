@@ -1,0 +1,1594 @@
+<!--
+  This calculator computation is made by Production Manager, John James Malubay,
+  for his company he works at, Yungatha Pty Ltd. Do not copy it.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Yungatha Strut & Streetplates Gaming</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --charcoal:#1F2428; --charcoal-2:#2A3136; --steel:#C7CDD1; --steel-light:#EDEFF1;
+    --orange:#FF6B1A; --orange-dark:#E0570F; --yellow:#FFC845; --green:#2E7D5B; --red:#C4432B; --blue:#2B5D96; --purple:#6B4FA0;
+    --steelplate:#546E7A; --steelplate-1:#8899A6; --steelplate-2:#37474F;
+    --bg:#F5F6F7; --line:#D7DBDE; --text:#20262A; --text-mute:#6B7480;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;}
+  header{background:var(--charcoal);color:#fff;padding:16px 26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;border-bottom:4px solid var(--orange);}
+  header h1{font-family:'Oswald',sans-serif;font-weight:600;font-size:24px;letter-spacing:0.5px;margin:0;text-transform:uppercase;}
+  header .tag{color:var(--steel);font-size:12.5px;margin-top:2px;font-family:'JetBrains Mono',monospace;}
+  .settings-bar{display:flex;gap:10px;align-items:center;background:var(--charcoal-2);padding:9px 14px;border-radius:8px;flex-wrap:wrap;}
+  .settings-bar .grp{display:flex;flex-direction:column;align-items:flex-start;}
+  .settings-bar label{font-size:10px;color:var(--steel);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px;}
+  .settings-bar input[type=number]{width:78px;background:#111417;color:#fff;border:1px solid #3a4147;border-radius:5px;padding:6px 7px;font-family:'JetBrains Mono',monospace;font-size:14px;}
+  .seam-toggle{display:flex;align-items:center;gap:7px;background:#111417;border:1px solid #3a4147;border-radius:6px;padding:8px 12px;}
+  .seam-toggle label{color:#fff;font-size:13px;text-transform:none;letter-spacing:0;margin:0;font-weight:600;}
+  .seam-toggle input{width:18px;height:18px;}
+  main{max-width:1300px;margin:0 auto;padding:22px 26px 60px;}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:22px;}
+  .panel-head{background:var(--steel-light);padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  .panel-head h2{font-family:'Oswald',sans-serif;font-size:19px;text-transform:uppercase;letter-spacing:0.5px;margin:0;color:var(--charcoal);}
+  .panel-head .count{font-size:13px;color:var(--text-mute);font-family:'JetBrains Mono',monospace;}
+  .reset-btn{background:#fff;border:1.5px solid var(--orange);color:var(--orange-dark);font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;}
+  .reset-btn:hover{background:var(--orange);color:#fff;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(31,36,40,0.6);display:flex;align-items:center;justify-content:center;z-index:1000;}
+  .modal-box{background:#fff;border-radius:14px;padding:28px 30px;width:92%;max-width:420px;box-shadow:0 12px 40px rgba(0,0,0,0.3);}
+  .modal-box h3{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:20px;margin:0 0 18px;color:var(--charcoal);letter-spacing:0.4px;}
+  .modal-field{margin-bottom:16px;}
+  .modal-field label{display:block;font-size:13px;font-weight:700;color:var(--charcoal);margin-bottom:6px;}
+  .modal-field .req{color:var(--red);}
+  .modal-field input{width:100%;box-sizing:border-box;font-size:16px;padding:10px 12px;border:2px solid var(--line);border-radius:8px;font-family:'Inter',sans-serif;}
+  .modal-field input:focus{outline:none;border-color:var(--orange);}
+  .modal-error{color:var(--red);font-size:13px;font-weight:600;margin:-6px 0 14px;}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px;}
+  .modal-cancel{background:#fff;border:1.5px solid var(--line);color:var(--text-mute);font-weight:700;font-size:14px;padding:9px 16px;border-radius:8px;cursor:pointer;}
+  .modal-cancel:hover{background:var(--steel-light);}
+  .modal-confirm{background:var(--orange);border:none;color:#fff;font-weight:700;font-size:14px;padding:9px 18px;border-radius:8px;cursor:pointer;}
+  .modal-confirm:hover{background:var(--orange-dark);}
+  .category-divider{display:flex;align-items:center;gap:16px;margin:8px 0 22px;color:var(--text-mute);font-family:'Oswald',sans-serif;font-size:12.5px;text-transform:uppercase;letter-spacing:1.5px;}
+  .category-divider::before,.category-divider::after{content:'';flex:1;height:2px;background:var(--line);}
+  details.bulk-paste{margin:0 20px 20px;border-top:1px solid var(--line);padding-top:14px;}
+  details.bulk-paste summary{cursor:pointer;font-weight:700;color:var(--orange-dark);font-size:14.5px;user-select:none;}
+  .bulk-paste-body{margin-top:12px;}
+  .bulk-hint{font-size:13px;color:var(--text-mute);line-height:1.6;margin:0 0 10px;}
+  .bulk-hint code{background:var(--steel-light);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--charcoal);}
+  .bulk-label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-mute);margin-bottom:5px;font-weight:700;}
+  .bulk-hint-inline{text-transform:none;font-weight:400;letter-spacing:0;}
+  #bulkDefaultType{font-size:14px;padding:8px 10px;border:2px solid var(--line);border-radius:8px;margin-bottom:12px;width:100%;max-width:340px;background:#fff;}
+  #bulkText{width:100%;font-family:'JetBrains Mono',monospace;font-size:13.5px;padding:12px;border:2px solid var(--line);border-radius:8px;resize:vertical;box-sizing:border-box;margin-bottom:12px;}
+  #bulkParseResult{margin-top:12px;font-size:14px;line-height:1.6;}
+  #bulkParseResult .parse-ok{color:var(--green);font-weight:700;}
+  #bulkParseResult .parse-warn{background:#FBE7E3;border:1px solid #EFB6AA;border-radius:8px;padding:10px 14px;margin-top:8px;color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12.5px;white-space:pre-wrap;}
+  .panel-body{padding:16px 20px;}
+
+  table.stock{width:100%;border-collapse:collapse;font-size:14px;}
+  table.stock th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-mute);padding:7px 6px;border-bottom:2px solid var(--line);}
+  table.stock td{padding:7px 6px;border-bottom:1px solid #ECEEF0;}
+  table.stock input[type=text],table.stock input[type=number]{border:1px solid var(--line);border-radius:5px;padding:7px 8px;font-family:'JetBrains Mono',monospace;font-size:14px;background:#fcfcfc;}
+  .num{width:90px;}
+  .type-chip{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-family:'Oswald',sans-serif;letter-spacing:0.4px;}
+  .type-dot{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .rm-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:19px;line-height:1;padding:2px 8px;}
+  .rm-btn:hover{opacity:0.7;}
+  .add-row{margin-top:12px;background:var(--steel-light);border:2px dashed var(--line);color:var(--charcoal);padding:11px 14px;border-radius:8px;font-size:15px;cursor:pointer;font-weight:700;width:100%;}
+  .add-row:hover{background:#e4e7e9;}
+
+  .piece-card{border:2px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px;background:#fcfcfc;}
+  .piece-top{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+  .piece-field{display:flex;flex-direction:column;}
+  .piece-field label{font-size:12px;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-mute);margin-bottom:5px;font-weight:700;}
+  .piece-field input[type=text]{font-size:17px;padding:10px 12px;border:2px solid var(--line);border-radius:8px;font-family:'Inter',sans-serif;width:210px;font-weight:600;}
+  .piece-field select{font-size:15px;padding:10px 10px;border:2px solid var(--line);border-radius:8px;font-family:'Inter',sans-serif;width:230px;font-weight:600;background:#fff;}
+  .piece-field input[type=number]{font-size:20px;padding:10px 10px;border:2px solid var(--line);border-radius:8px;font-family:'JetBrains Mono',monospace;width:120px;font-weight:700;text-align:center;}
+  .piece-field.qty input{width:90px;}
+  .piece-remove{margin-left:auto;}
+  .piece-remove button{background:none;border:none;color:var(--red);font-size:22px;cursor:pointer;padding:6px 10px;}
+  .piece-hint{margin-top:10px;font-size:13px;color:var(--text-mute);background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;}
+  .piece-hint b{color:var(--charcoal);}
+
+  .calc-bar{margin:26px 0;display:flex;justify-content:center;}
+  .calc-btn{background:var(--orange);color:#fff;border:none;padding:18px 44px;border-radius:10px;font-family:'Oswald',sans-serif;font-size:21px;text-transform:uppercase;letter-spacing:0.6px;cursor:pointer;box-shadow:0 4px 0 var(--orange-dark);}
+  .calc-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--orange-dark);}
+  .calc-btn:hover{background:#ff7a2e;}
+
+  .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+  @media(max-width:1100px){.summary{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:650px){.summary{grid-template-columns:repeat(2,1fr);}}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 14px;border-top:5px solid var(--orange);}
+  .stat.good{border-top-color:var(--green);}
+  .stat.warn{border-top-color:var(--red);}
+  .stat .num-big{font-family:'Oswald',sans-serif;font-size:28px;font-weight:600;color:var(--charcoal);}
+  .stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-mute);margin-top:2px;font-weight:600;}
+
+  .section-title{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:19px;letter-spacing:0.5px;margin:32px 0 14px;color:var(--charcoal);border-left:6px solid var(--orange);padding-left:12px;}
+  .section-title.err{border-left-color:var(--red);}
+  .section-title.info{border-left-color:var(--blue);}
+  details.job-breakdown{margin-bottom:10px;}
+  details.job-breakdown summary.section-title{cursor:pointer;user-select:none;list-style:revert;}
+  details.job-breakdown summary.section-title::marker{color:var(--orange);}
+  details.job-breakdown summary.section-title:hover{color:var(--orange-dark);}
+  details.job-breakdown[open] summary.section-title{margin-bottom:14px;}
+
+  .order-table{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+  .order-table table{width:100%;border-collapse:collapse;font-size:15px;}
+  .order-table th,.order-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #ECEEF0;}
+  .order-table thead th{font-size:11.5px;text-transform:uppercase;color:var(--text-mute);background:var(--steel-light);}
+  .pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap;}
+  .pill.a{background:#E1EAF4;color:var(--blue);}
+  .pill.b{background:#E1F0E9;color:var(--green);}
+  .pill.ja{background:#FFE7D9;color:var(--orange-dark);}
+  .pill.jb{background:#FFF6DA;color:#9A7300;}
+  .pill.z{background:#ECE4F5;color:var(--purple);}
+  .pill.sp150{background:#E4E9EC;color:var(--steelplate-1);}
+  .pill.sp200{background:#DDE2E4;color:var(--steelplate-2);}
+
+  .type-panel .panel-head{border-left:8px solid var(--orange);}
+  .type-panel.a .panel-head{border-left-color:var(--blue);}
+  .type-panel.b .panel-head{border-left-color:var(--green);}
+  .type-panel.ja .panel-head{border-left-color:var(--orange);}
+  .type-panel.jb .panel-head{border-left-color:var(--yellow);}
+  .type-panel.z .panel-head{border-left-color:var(--purple);}
+  .type-panel.sp150 .panel-head{border-left-color:var(--steelplate-1);}
+  .type-panel.sp200 .panel-head{border-left-color:var(--steelplate-2);}
+
+  .bar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:16px;}
+  .steps-list{margin:0 0 16px;padding-left:22px;font-size:15px;line-height:1.9;color:var(--text);}
+  .steps-list li{margin-bottom:2px;}
+  .steps-list b{color:var(--orange-dark);}
+  .cut-summary{margin:0 0 16px;font-size:16px;line-height:1.7;color:var(--text);background:var(--steel-light);border:1px solid var(--line);border-radius:8px;padding:12px 16px;font-weight:600;}
+  .bar-card{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .bar-card .cc-head{background:var(--charcoal);color:#fff;padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:13px;display:flex;justify-content:space-between;gap:8px;}
+  .cc-body{padding:12px;}
+  .legend-note{font-size:12.5px;color:var(--text-mute);padding:10px 14px;border-top:1px solid var(--line);background:var(--steel-light);line-height:1.5;}
+  .multiplier-badge{position:absolute;top:8px;right:8px;background:var(--orange);color:#fff;font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;padding:4px 10px;border-radius:20px;box-shadow:0 2px 4px rgba(0,0,0,0.2);z-index:2;}
+
+  .bundle-table{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+  .bundle-table table{width:100%;border-collapse:collapse;font-size:15px;}
+  .bundle-table th,.bundle-table td{padding:11px 14px;text-align:left;border-bottom:1px solid #ECEEF0;}
+  .bundle-table thead th{font-size:11.5px;text-transform:uppercase;color:var(--text-mute);background:var(--steel-light);}
+  .bundle-table td.num, .bundle-table th.num{text-align:right;font-family:'JetBrains Mono',monospace;}
+  .bundle-table .spare{color:var(--green);font-weight:700;}
+  .bundle-table .big-num{font-size:26px;font-weight:800;font-family:'Oswald',sans-serif;}
+  .bundle-table .big-num-secondary{font-size:19px;font-weight:700;color:var(--text-mute);}
+  .bundle-table tr.row-needs-buy{background:#FFF3EC;}
+  .bundle-table tr.row-needs-buy .flag-buy{color:var(--orange-dark);}
+  .bundle-table tr.row-covered{background:#F1F8F4;}
+  .bundle-table tr.row-covered .flag-ok{color:var(--green);}
+  .bundle-table .ok-tag{font-size:13px;font-weight:700;color:var(--green);vertical-align:middle;}
+  .bundle-table tr.row-total{background:var(--charcoal);color:#fff;font-weight:800;}
+  .bundle-table tr.row-total td{border-bottom:none;padding-top:14px;padding-bottom:14px;}
+  .bundle-table tr.row-total .big-num,.bundle-table tr.row-total .big-num-secondary{color:#fff;}
+
+  .blocked-table{background:#fff;border:2px solid #EFB6AA;border-radius:12px;overflow:hidden;margin-bottom:10px;}
+  .blocked-table table{width:100%;border-collapse:collapse;font-size:15px;}
+  .blocked-table th,.blocked-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #f3d9d3;}
+  .blocked-table thead{background:#FBE7E3;}
+
+  .offcut-summary{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .offcut-summary table{width:100%;border-collapse:collapse;font-size:15px;}
+  .offcut-summary th,.offcut-summary td{padding:11px 14px;text-align:left;border-bottom:1px solid #ECEEF0;}
+  .offcut-summary thead th{font-size:11.5px;text-transform:uppercase;color:var(--text-mute);background:var(--steel-light);}
+  .offcut-summary .sizecell{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px;}
+  .status-keep{color:var(--green);font-weight:700;}
+  .status-scrap{color:var(--red);font-weight:700;}
+
+  .empty-hint{color:var(--text-mute);font-size:14px;padding:12px 4px;}
+  .order-note{background:#fff;border:1px solid var(--line);border-left:6px solid var(--orange);border-radius:10px;padding:18px 20px;font-size:15.5px;line-height:1.7;}
+  .order-note b{color:var(--orange-dark);}
+
+  .print-only{display:none;}
+  .print-svg-only{display:none;}
+
+  @media print{
+    body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .no-print{display:none!important;}
+    .print-only{display:block;margin-bottom:14px;}
+    .print-letterhead{text-align:center;border-bottom:2px solid var(--line);padding-bottom:6px;margin-bottom:12px;}
+    .print-company{font-family:'Oswald',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:var(--text-mute);}
+    .print-sub{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-mute);margin-top:2px;}
+    .print-job-banner{background:var(--charcoal);color:#fff;border-radius:8px;padding:6px 22px;border-left:8px solid var(--orange);}
+    .pjb-line{display:flex;align-items:baseline;gap:16px;margin:0;line-height:1;}
+    .pjb-label{font-family:'Oswald',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:700;min-width:100px;flex-shrink:0;}
+    .pjb-value{font-family:'Oswald',sans-serif;font-size:40px;font-weight:800;letter-spacing:0.3px;line-height:1;}
+    main{padding:0;max-width:100%;}
+    .panel{border-radius:0;box-shadow:none;margin-bottom:6px;border-color:#999;}
+    .panel-head{padding:6px 10px;page-break-after:avoid;break-after:avoid;}
+    .panel-head h2{font-size:16px;}
+    .panel-head .count{font-size:12px;}
+    .section-title{font-size:15px;margin:10px 0 6px;}
+    /* Streetplates: full page width, one per row. Busy bars with several
+       small labeled pieces need all the width they can get for the street
+       names to stay legible — worth a few extra pages. */
+    /* Plain block flow instead of CSS Grid for print specifically — grid
+       fragmentation across page breaks tends to bump a whole card to the
+       next page even when there was room for something, leaving a big
+       blank gap behind it. Block flow lets the browser pack pages far more
+       tightly. Visually identical here since it's already a single column
+       either way. */
+    .bar-grid{display:block!important;}
+    .bar-card{border-radius:0;margin:0 0 10px;}
+    .cc-head{page-break-after:avoid;break-after:avoid;}
+    .cc-body{page-break-inside:avoid;break-inside:avoid;}
+    .cc-head{padding:5px 10px;font-size:12.5px;}
+    .cc-body{padding:6px;}
+    .legend-note{display:none!important;}
+    .multiplier-badge{font-size:12px;padding:4px 10px;top:5px;right:5px;}
+    .print-svg-only{display:block!important;}
+
+    /* Struts: only the dimension number matters (no names to fit), so pack
+       these dense — one bundle per row, full width — to keep the strut
+       section down to as few pages as possible while the number itself
+       stays big and easy to read. The print version of each diagram is a
+       genuinely different, shorter drawing (not the tall on-screen one
+       squashed down), so the numbers render crisp instead of stretched. */
+    .bundled-type .bar-card{margin:0 0 3px;}
+    .bundled-type .cc-head{padding:2px 8px;font-size:10px;}
+    .bundled-type .cc-head span:last-child{display:none;}
+    .bundled-type .cc-body{padding:2px;}
+    .bundled-type .multiplier-badge{font-size:10px;padding:2px 7px;top:3px;right:3px;}
+    .bundled-type .cut-summary,.bundled-type .steps-list{font-size:12px;margin-bottom:8px;}
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ===== ACCESS GATE (Project AiT / Yungatha licensing layer) ===== -->
+<style>
+  #aitGate{
+    position:fixed; inset:0; z-index:9999;
+    background:var(--charcoal);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+  }
+  #aitGate .gateCard{
+    width:100%; max-width:380px;
+    background:linear-gradient(180deg,#23292e,#1c2124);
+    border:1px solid #3a4147;
+    border-top:3px solid var(--orange);
+    border-radius:10px;
+    padding:32px 28px;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  #aitGate .gateLock{
+    width:44px; height:44px; margin:0 auto 16px;
+    border-radius:50%;
+    background:rgba(255,107,26,.1);
+    display:flex; align-items:center; justify-content:center;
+  }
+  #aitGate .gateLock svg{ width:20px; height:20px; stroke:var(--orange); fill:none; stroke-width:2; }
+  #aitGate h2{
+    margin:0 0 6px; font-size:1.05rem; letter-spacing:.02em;
+    color:#fff; font-family:'Inter',sans-serif;
+  }
+  #aitGate p{
+    margin:0 0 20px; font-size:.8rem; color:var(--steel);
+  }
+  #aitGate .gateInputWrap{
+    position:relative;
+    margin-bottom:12px;
+  }
+  #aitGate input{
+    width:100%; box-sizing:border-box;
+    background:#111417; border:1px solid #3a4147; border-radius:6px;
+    color:#fff; font-family:'JetBrains Mono',monospace; font-size:.95rem;
+    padding:11px 44px 11px 14px; text-align:center; letter-spacing:.08em;
+  }
+  #aitGate input:focus{ outline:none; border-color:var(--orange); }
+  #aitGate .gateToggle{
+    position:absolute; top:0; right:0; bottom:0;
+    width:40px;
+    display:flex; align-items:center; justify-content:center;
+    background:none; border:none; padding:0; cursor:pointer;
+  }
+  #aitGate .gateToggle svg{
+    width:19px; height:19px;
+    stroke:var(--steel); fill:none; stroke-width:1.8;
+  }
+  #aitGate .gateToggle:hover svg{ stroke:var(--orange); }
+  #aitGate button.gateSubmit{
+    width:100%; background:var(--orange); color:#1c2124; border:none;
+    border-radius:6px; padding:11px 14px; font-weight:700; font-size:.85rem;
+    font-family:'Inter',sans-serif; cursor:pointer; letter-spacing:.02em;
+  }
+  #aitGate button.gateSubmit:hover{ background:#ff7a2e; }
+  #aitGate .gateError{
+    margin-top:12px; font-size:.78rem; color:var(--red);
+    min-height:1em;
+  }
+  #aitGate .gateFooter{
+    margin-top:22px; font-size:.68rem; color:var(--steel);
+    border-top:1px dashed #3a4147; padding-top:14px;
+  }
+  #appContent{ display:none; }
+</style>
+
+<div id="aitGate">
+  <div class="gateCard">
+    <div class="gateLock">
+      <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h2>Yungatha &mdash; Strut &amp; Streetplates Gaming</h2>
+    <p>Licensed tool. Enter your access code to continue.</p>
+    <div class="gateInputWrap">
+      <input type="password" id="aitGateInput" placeholder="Access code" autocomplete="off" />
+      <button type="button" class="gateToggle" id="aitToggleBtn" onclick="aitTogglePw()" aria-label="Show password">
+        <svg id="aitEyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <button class="gateSubmit" onclick="aitCheckCode()">Unlock</button>
+    <div class="gateError" id="aitGateError"></div>
+    <div class="gateFooter">&copy; JSTZN / Yungatha Pty Ltd &mdash; unauthorised distribution prohibited</div>
+  </div>
+</div>
+
+<script>
+  const AIT_ACCESS_CODE = "YUNGATHA2026";
+  function aitCheckCode(){
+    const val = document.getElementById('aitGateInput').value.trim();
+    if(val === AIT_ACCESS_CODE){
+      sessionStorage.setItem('aitUnlocked','1');
+      document.getElementById('aitGate').style.display='none';
+      document.getElementById('appContent').style.display='block';
+    } else {
+      document.getElementById('aitGateError').textContent = 'Incorrect code. Please try again.';
+    }
+  }
+  function aitTogglePw(){
+    const input = document.getElementById('aitGateInput');
+    const eye = document.getElementById('aitEyeIcon');
+    const btn = document.getElementById('aitToggleBtn');
+    if(input.type === 'password'){
+      input.type = 'text';
+      eye.innerHTML = '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a18.5 18.5 0 0 1 4.22-5.19M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      btn.setAttribute('aria-label','Hide password');
+    } else {
+      input.type = 'password';
+      eye.innerHTML = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>';
+      btn.setAttribute('aria-label','Show password');
+    }
+  }
+  document.getElementById('aitGateInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ aitCheckCode(); }
+  });
+  if(sessionStorage.getItem('aitUnlocked') === '1'){
+    document.getElementById('aitGate').style.display='none';
+    document.addEventListener('DOMContentLoaded', function(){
+      document.getElementById('appContent').style.display='block';
+    });
+  }
+</script>
+<!-- ===== END ACCESS GATE ===== -->
+
+<div id="appContent">
+
+<div class="print-only" id="printHeader">
+  <div class="print-letterhead">
+    <div class="print-company">Yungatha Strut &amp; Streetplates Gaming</div>
+    <div class="print-sub">Workshop Cutting Sheet &nbsp;·&nbsp; Printed <span id="printDate"></span></div>
+  </div>
+  <div class="print-job-banner">
+    <div class="pjb-line"><span class="pjb-label">Client</span><span class="pjb-value" id="pjbClient"></span></div>
+    <div class="pjb-line"><span class="pjb-label">Job No.</span><span class="pjb-value" id="pjbJobNo"></span></div>
+  </div>
+</div>
+
+<div class="modal-overlay no-print" id="printInfoModal" style="display:none;">
+  <div class="modal-box">
+    <h3>Before we print...</h3>
+    <div class="modal-field">
+      <label>Who is it for? <span class="req">*</span></label>
+      <input type="text" id="printClientName" placeholder="Client's name">
+    </div>
+    <div class="modal-field">
+      <label>What is the Job Number? <span class="req">*</span></label>
+      <input type="text" id="printJobNumber" placeholder="Job number">
+    </div>
+    <div class="modal-error" id="printModalError" style="display:none;">Please fill in both fields before printing.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closePrintInfoModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmPrintInfo()">🖨️ Print Workshop Sheet</button>
+    </div>
+  </div>
+</div>
+
+<header class="no-print">
+  <div>
+    <h1>Yungatha Strut &amp; Streetplates Gaming</h1>
+    <div class="tag">A / B / Joiner Strut bundle &amp; cut planning</div>
+  </div>
+  <div class="settings-bar">
+    <div class="grp"><label>Kerf (mm)</label><input type="number" id="kerf" value="2" min="0" step="0.5"></div>
+    <div class="seam-toggle"><input type="checkbox" id="kerfEnabled" checked><label for="kerfEnabled">Include kerf loss</label></div>
+    <div class="grp"><label>Min Usable Offcut (mm)</label><input type="number" id="minOffcut" value="400" min="0" step="10"></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- BUNDLE / STOCK SETTINGS -->
+  <div class="panel no-print">
+    <div class="panel-head"><h2>Strut Stock &amp; Bundle Sizes</h2><button class="reset-btn" onclick="resetToDefaults()">↺ Reset to Defaults</button></div>
+    <div class="panel-body">
+      <table class="stock">
+        <thead><tr><th>Strut Type</th><th>Stock Length (mm)</th><th>Pieces per Bundle</th><th>In Stock (full lengths)</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="type-chip"><span class="type-dot" style="background:var(--blue);"></span>A-Strut</span></td>
+            <td><input type="number" class="num" id="stockLen_A" value="6500"></td>
+            <td><input type="number" class="num" id="bundle_A" value="4"></td>
+            <td><input type="number" class="num" id="inStock_A" value="0" min="0"></td>
+            <td class="empty-hint" style="padding:0;">Standalone strut</td>
+          </tr>
+          <tr>
+            <td><span class="type-chip"><span class="type-dot" style="background:var(--green);"></span>B-Strut</span></td>
+            <td><input type="number" class="num" id="stockLen_B" value="6500"></td>
+            <td><input type="number" class="num" id="bundle_B" value="2"></td>
+            <td><input type="number" class="num" id="inStock_B" value="0" min="0"></td>
+            <td class="empty-hint" style="padding:0;">Standalone strut</td>
+          </tr>
+          <tr>
+            <td><span class="type-chip"><span class="type-dot" style="background:var(--orange);"></span>J-aStrut</span></td>
+            <td><input type="number" class="num" id="stockLen_Ja" value="6500"></td>
+            <td><input type="number" class="num" id="bundle_Ja" value="2"></td>
+            <td><input type="number" class="num" id="inStock_Ja" value="0" min="0"></td>
+            <td class="empty-hint" style="padding:0;">Pairs with Z-Strut → "Astruts Joiner"</td>
+          </tr>
+          <tr>
+            <td><span class="type-chip"><span class="type-dot" style="background:var(--yellow);"></span>J-bStrut</span></td>
+            <td><input type="number" class="num" id="stockLen_Jb" value="6500"></td>
+            <td><input type="number" class="num" id="bundle_Jb" value="2"></td>
+            <td><input type="number" class="num" id="inStock_Jb" value="0" min="0"></td>
+            <td class="empty-hint" style="padding:0;">Pairs with Z-Strut → "Bstruts Joiner"</td>
+          </tr>
+          <tr>
+            <td><span class="type-chip"><span class="type-dot" style="background:var(--purple);"></span>Z-Strut</span></td>
+            <td><input type="number" class="num" id="stockLen_Z" value="6500"></td>
+            <td><input type="number" class="num" id="bundle_Z" value="5"></td>
+            <td><input type="number" class="num" id="inStock_Z" value="0" min="0"></td>
+            <td class="empty-hint" style="padding:0;">Shared "nut" — pairs with either J-a or J-b</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="category-divider no-print"><span>Different Product Category</span></div>
+
+  <!-- STREETPLATES -->
+  <div class="panel no-print" id="streetplatesPanel">
+    <div class="panel-head" style="border-left:8px solid var(--steelplate);"><h2>Streetplates</h2></div>
+    <div class="panel-body">
+      <table class="stock">
+        <thead><tr><th>Streetplate Type</th><th>Stock Length (mm)</th><th>In Stock (full lengths)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="type-chip"><span class="type-dot" style="background:var(--steelplate-1);"></span>150 Streetplates</span></td>
+            <td><input type="number" class="num" id="stockLen_SP150" value="6500"></td>
+            <td><input type="number" class="num" id="inStock_SP150" value="0" min="0"></td>
+          </tr>
+          <tr>
+            <td><span class="type-chip"><span class="type-dot" style="background:var(--steelplate-2);"></span>200 Streetplates</span></td>
+            <td><input type="number" class="num" id="stockLen_SP200" value="6500"></td>
+            <td><input type="number" class="num" id="inStock_SP200" value="0" min="0"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="category-divider no-print"><span>Back To Strut Cutting</span></div>
+
+  <!-- ORDER INPUT -->
+  <div class="panel no-print">
+    <div class="panel-head"><h2>What Do You Need To Cut?</h2><span class="count" id="orderCount">0 lines</span></div>
+    <div class="panel-body" id="orderBody"></div>
+    <div style="padding:0 20px 18px;">
+      <button class="add-row" onclick="addOrderRow()">+ Add a cut you need</button>
+    </div>
+
+    <details class="bulk-paste">
+      <summary>📋 Paste a list instead (faster for big jobs)</summary>
+      <div class="bulk-paste-body">
+        <p class="bulk-hint">
+          Paste lines like <code>2 x Peregrine Drive - 1060mm</code>. You can include header lines
+          like <code>150 Streetplates</code> or <code>200 Streetplates</code> (or <code>A-Strut</code>, <code>B-Strut</code>) —
+          everything under a header uses that type, until the next header.
+        </p>
+        <label class="bulk-label">Default Type <span class="bulk-hint-inline">(used for any lines before the first header, or if you don't include headers)</span></label>
+        <select id="bulkDefaultType">
+          <option value="A">A-Strut</option>
+          <option value="B">B-Strut</option>
+          <option value="AJ">Astruts Joiner (J-a + Z)</option>
+          <option value="BJ">Bstruts Joiner (J-b + Z)</option>
+          <option value="SP150" selected>150 Streetplates</option>
+          <option value="SP200">200 Streetplates</option>
+        </select>
+        <textarea id="bulkText" rows="10" placeholder="150 Streetplates
+2 x Peregrine Drive - 1060mm
+4 x Shearwater Way - 1200mm
+
+200 Streetplates
+1 x Shearwater Way - 1200mm"></textarea>
+        <button class="add-row" onclick="parseBulkPaste()">Add These To My List</button>
+        <div id="bulkParseResult"></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="calc-bar no-print">
+    <button class="calc-btn" onclick="runCalculation()">Calculate Best Cut Plan</button>
+  </div>
+
+  <div id="results" style="display:none;">
+
+    <div class="calc-bar no-print" style="margin:0 0 20px;">
+      <button class="calc-btn" style="background:var(--charcoal);box-shadow:0 4px 0 #000;" onclick="openPrintInfoModal()">🖨️ Export / Print Workshop Sheet</button>
+    </div>
+
+    <div class="summary no-print" id="summaryStats"></div>
+
+    <div id="blockedSection" style="display:none;">
+      <div class="section-title err">Cannot Be Cut As Specified</div>
+      <div class="blocked-table">
+        <table><thead><tr><th>Line</th><th>Type</th><th>Length</th><th>Qty</th><th>Reason</th></tr></thead><tbody id="blockedBody"></tbody></table>
+      </div>
+    </div>
+
+    <details class="job-breakdown no-print">
+      <summary class="section-title">Job Breakdown — Where Each Line Comes From</summary>
+      <div class="order-table">
+        <table><thead><tr><th>Type</th><th>Length</th><th>Qty Needed</th></tr></thead><tbody id="fulfilBody"></tbody></table>
+      </div>
+    </details>
+
+    <div class="section-title no-print">Bundles To Buy</div>
+    <div class="bundle-table no-print">
+      <table>
+        <thead><tr><th>Strut Type</th><th class="num">Bundles To Buy</th><th class="num">Spare Full Lengths Left</th></tr></thead>
+        <tbody id="bundleBody"></tbody>
+      </table>
+    </div>
+
+    <div class="order-note no-print" id="orderNote" style="margin-top:16px;"></div>
+
+    <div class="section-title info no-print">Offcut Summary — What You'll Have Left</div>
+    <div class="offcut-summary no-print">
+      <table>
+        <thead><tr><th>Strut Type</th><th>Offcut Size</th><th>Qty</th><th>Status</th></tr></thead>
+        <tbody id="offcutSummaryBody"></tbody>
+      </table>
+    </div>
+
+    <div id="cutSections"></div>
+
+  </div>
+
+</main>
+
+<script>
+const COLORS = ['#7FB3D5','#F4B183','#A9D18E','#D9A9D9','#F7CB73','#88C9C9','#E39696','#B7B7EB','#9FD8A0','#F0A8C1'];
+
+function escapeXML(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+}
+
+const TYPE_INFO = {
+  A:  {label:'A-Strut',   pillClass:'a',  color:'var(--blue)',   dot:'#2B5D96', bundled:true},
+  B:  {label:'B-Strut',   pillClass:'b',  color:'var(--green)',  dot:'#2E7D5B', bundled:true},
+  Ja: {label:'J-aStrut',  pillClass:'ja', color:'var(--orange)', dot:'#FF6B1A', bundled:true},
+  Jb: {label:'J-bStrut',  pillClass:'jb', color:'var(--yellow)', dot:'#FFC845', bundled:true},
+  Z:  {label:'Z-Strut',   pillClass:'z',  color:'var(--purple)', dot:'#6B4FA0', bundled:true},
+  SP150: {label:'150 Streetplates', pillClass:'sp150', color:'var(--steelplate-1)', dot:'#8899A6', bundled:false},
+  SP200: {label:'200 Streetplates', pillClass:'sp200', color:'var(--steelplate-2)', dot:'#37474F', bundled:false}
+};
+
+const ORDER_TYPE_INFO = {
+  A:  {label:'A-Strut', pillClass:'a'},
+  B:  {label:'B-Strut', pillClass:'b'},
+  AJ: {label:'Astruts Joiner', pillClass:'ja'},
+  BJ: {label:'Bstruts Joiner', pillClass:'jb'},
+  SP150: {label:'150 Streetplates', pillClass:'sp150'},
+  SP200: {label:'200 Streetplates', pillClass:'sp200'}
+};
+
+const DEFAULTS = {
+  A:  {stockLen:6500, bundle:4,  inStock:100},
+  B:  {stockLen:6500, bundle:2,  inStock:100},
+  Ja: {stockLen:6500, bundle:2,  inStock:100},
+  Jb: {stockLen:6500, bundle:2,  inStock:100},
+  Z:  {stockLen:6500, bundle:5,  inStock:100},
+  SP150: {stockLen:6500, bundle:1, inStock:0},
+  SP200: {stockLen:6500, bundle:1, inStock:0}
+};
+
+const STORAGE_KEY = 'yungathaStrutCalcState_v1';
+
+function resetToDefaults(){
+  if(!confirm('Reset all stock lengths, bundle sizes and stock-on-hand back to defaults, and clear the current cut list?')) return;
+  Object.keys(DEFAULTS).forEach(typeKey=>{
+    document.getElementById('stockLen_'+typeKey).value = DEFAULTS[typeKey].stockLen;
+    const bundleEl = document.getElementById('bundle_'+typeKey);
+    if(bundleEl) bundleEl.value = DEFAULTS[typeKey].bundle;
+    document.getElementById('inStock_'+typeKey).value = DEFAULTS[typeKey].inStock;
+  });
+  document.getElementById('orderBody').innerHTML = '';
+  updateCounts();
+  document.getElementById('results').style.display = 'none';
+  addOrderRow('A', 3000, 1);
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+}
+
+// Auto-save/restore: every time Calculate is run, the whole job (stock
+// settings + the cut list) is saved to this browser's local storage, so
+// closing and reopening the file picks up right where you left off —
+// including working from the offcuts a previous calculation produced.
+function saveState(){
+  try {
+    const cfg = getBundleConfig();
+    const rows = Array.from(document.getElementById('orderBody').children).map(card=>({
+      type: card.querySelector('.typefield').value,
+      length: card.querySelector('.lenfield').value,
+      qty: card.querySelector('.qtyfield').value,
+      jobLabel: card.querySelector('.labelfield') ? card.querySelector('.labelfield').value : ''
+    }));
+    const state = {
+      kerf: document.getElementById('kerf').value,
+      kerfEnabled: document.getElementById('kerfEnabled').checked,
+      minOffcut: document.getElementById('minOffcut').value,
+      bundleConfig: cfg,
+      rows: rows,
+      savedAt: new Date().toISOString()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e){ /* storage unavailable — fail silently, calculator still works */ }
+}
+
+function loadState(){
+  let state = null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) state = JSON.parse(raw);
+  } catch(e){ state = null; }
+  if(!state) return false;
+
+  Object.keys(state.bundleConfig||{}).forEach(typeKey=>{
+    const c = state.bundleConfig[typeKey];
+    const stockLenEl = document.getElementById('stockLen_'+typeKey);
+    const bundleEl = document.getElementById('bundle_'+typeKey);
+    const inStockEl = document.getElementById('inStock_'+typeKey);
+    if(stockLenEl && c.stockLen!=null) stockLenEl.value = c.stockLen;
+    if(bundleEl && c.bundle!=null) bundleEl.value = c.bundle;
+    if(inStockEl && c.inStock!=null) inStockEl.value = c.inStock;
+  });
+  if(state.kerf!=null) document.getElementById('kerf').value = state.kerf;
+  if(state.kerfEnabled!=null) document.getElementById('kerfEnabled').checked = state.kerfEnabled;
+  if(state.minOffcut!=null) document.getElementById('minOffcut').value = state.minOffcut;
+
+  document.getElementById('orderBody').innerHTML = '';
+  (state.rows||[]).forEach(r=>{
+    addOrderRow(r.type, parseFloat(r.length), parseInt(r.qty), r.jobLabel||undefined);
+  });
+  if((state.rows||[]).length===0) addOrderRow('A', 3000, 1);
+
+  return true;
+}
+
+let orderRowId = 0;
+
+
+const STREETPLATE_TYPES = ['SP150','SP200'];
+
+function addOrderRow(type, length, qty, plateLabel){
+  const id = 'ord'+(orderRowId++);
+  const card = document.createElement('div');
+  card.className = 'piece-card';
+  card.id = id;
+  card.innerHTML = `
+    <div class="piece-top">
+      <div class="piece-field"><label>Type</label>
+        <select class="typefield">
+          <option value="A">A-Strut</option>
+          <option value="B">B-Strut</option>
+          <option value="AJ">Astruts Joiner (J-a + Z)</option>
+          <option value="BJ">Bstruts Joiner (J-b + Z)</option>
+          <option value="SP150">150 Streetplates</option>
+          <option value="SP200">200 Streetplates</option>
+        </select>
+      </div>
+      <div class="piece-field label-field-wrap" style="display:none;"><label>Label Name</label><input type="text" class="labelfield" placeholder="e.g. Driveway A" value="${plateLabel??''}"></div>
+      <div class="piece-field"><label>Length (mm)</label><input type="number" class="lenfield" value="${length??3000}" min="1"></div>
+      <div class="piece-field qty"><label>Qty Needed</label><input type="number" class="qtyfield" value="${qty??1}" min="1"></div>
+      <div class="piece-remove"><button onclick="document.getElementById('${id}').remove();updateCounts();">&times;</button></div>
+    </div>
+  `;
+  document.getElementById('orderBody').appendChild(card);
+  const typeSelect = card.querySelector('.typefield');
+  if(type) typeSelect.value = type;
+
+  const labelWrap = card.querySelector('.label-field-wrap');
+  function syncLabelVisibility(){
+    labelWrap.style.display = STREETPLATE_TYPES.includes(typeSelect.value) ? '' : 'none';
+  }
+  syncLabelVisibility();
+  typeSelect.addEventListener('change', syncLabelVisibility);
+
+  const lenInput = card.querySelector('.lenfield');
+  const qtyInput = card.querySelector('.qtyfield');
+  // Enter on Length -> jump to Qty. Enter on Qty -> add a new row (same
+  // Type carried forward) and focus its Length field, so a whole cut list
+  // can be typed without ever touching the mouse.
+  lenInput.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); qtyInput.focus(); qtyInput.select(); }
+  });
+  qtyInput.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){
+      e.preventDefault();
+      const currentType = typeSelect.value;
+      const newCard = addOrderRow(currentType, length??3000, 1);
+      const newLen = newCard.querySelector('.lenfield');
+      newLen.focus();
+      newLen.select();
+    }
+  });
+
+  updateCounts();
+  return card;
+}
+
+
+function updateCounts(){
+  document.getElementById('orderCount').textContent = document.getElementById('orderBody').children.length + ' lines';
+}
+
+const BULK_HEADER_MAP = {
+  '150streetplates': 'SP150',
+  '200streetplates': 'SP200',
+  'astrut': 'A',
+  'bstrut': 'B',
+  'astrutsjoiner': 'AJ',
+  'bstrutsjoiner': 'BJ'
+};
+
+function bulkNormalize(line){
+  return line.toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+
+// Parses lines like "2 x Peregrine Drive - 1060mm" and header lines like
+// "150 Streetplates" that switch the type for everything under them.
+// Text pasted from Word, PDFs, or other "smart typography" sources often
+// swaps a plain hyphen for an en dash (–), em dash (—), or minus sign (−),
+// and regular spaces for non-breaking spaces — all invisible differences
+// that used to silently break every line. Normalize all of that away first.
+function normalizeForParsing(line){
+  return line
+    .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]+/g, '-')
+    .replace(/[\u00A0\u2007\u202F]/g, ' ');
+}
+
+function parseBulkPaste(){
+  const text = document.getElementById('bulkText').value;
+  const lines = text.split('\n');
+  let currentType = document.getElementById('bulkDefaultType').value;
+  // Qty, Label, Dimension — the "x" after qty, the dash before the number,
+  // and the "mm" suffix are all optional. Whatever's left between the
+  // leading quantity and the trailing number is treated as the label.
+  const lineRegex = /^(\d+)\s*(?:[x×]\s*)?(.+?)\s*-*\s*([\d,]+(?:\.\d+)?)\s*(?:mm)?\s*$/i;
+
+  let added = 0;
+  const skipped = [];
+
+  lines.forEach(raw=>{
+    const line = normalizeForParsing(raw.trim());
+    if(!line) return;
+
+    const normalized = bulkNormalize(line);
+    if(BULK_HEADER_MAP[normalized]){
+      currentType = BULK_HEADER_MAP[normalized];
+      return;
+    }
+
+    const m = line.match(lineRegex);
+    if(!m){
+      skipped.push(line);
+      return;
+    }
+    const qty = parseInt(m[1]);
+    const label = m[2].trim();
+    // Strip thousands-separator commas ("1,754.271" -> "1754.271"), then
+    // drop any decimal places — we only work in whole millimetres.
+    const lengthClean = m[3].replace(/,/g,'');
+    const length = Math.round(parseFloat(lengthClean));
+    if(!qty || !length){ skipped.push(line); return; }
+
+    addOrderRow(currentType, length, qty, STREETPLATE_TYPES.includes(currentType) ? label : undefined);
+    added++;
+  });
+
+  const resultEl = document.getElementById('bulkParseResult');
+  let html = `<span class="parse-ok">✓ Added ${added} line${added!==1?'s':''} to your cut list.</span>`;
+  if(skipped.length){
+    html += `<div class="parse-warn">${skipped.length} line${skipped.length!==1?'s':''} couldn't be read and were skipped — check the format (expects "Qty x Label - Lengthmm"):\n${skipped.map(s=>'• '+s).join('\n')}</div>`;
+  }
+  resultEl.innerHTML = html;
+}
+
+function getBundleConfig(){
+  return {
+    A:  {stockLen: parseFloat(document.getElementById('stockLen_A').value)||6500,  bundle: parseInt(document.getElementById('bundle_A').value)||1,  inStock: parseInt(document.getElementById('inStock_A').value)||0},
+    B:  {stockLen: parseFloat(document.getElementById('stockLen_B').value)||6500,  bundle: parseInt(document.getElementById('bundle_B').value)||1,  inStock: parseInt(document.getElementById('inStock_B').value)||0},
+    Ja: {stockLen: parseFloat(document.getElementById('stockLen_Ja').value)||6500, bundle: parseInt(document.getElementById('bundle_Ja').value)||1, inStock: parseInt(document.getElementById('inStock_Ja').value)||0},
+    Jb: {stockLen: parseFloat(document.getElementById('stockLen_Jb').value)||6500, bundle: parseInt(document.getElementById('bundle_Jb').value)||1, inStock: parseInt(document.getElementById('inStock_Jb').value)||0},
+    Z:  {stockLen: parseFloat(document.getElementById('stockLen_Z').value)||6500,  bundle: parseInt(document.getElementById('bundle_Z').value)||1,  inStock: parseInt(document.getElementById('inStock_Z').value)||0},
+    SP150: {stockLen: parseFloat(document.getElementById('stockLen_SP150').value)||6500, bundle: 1, inStock: parseInt(document.getElementById('inStock_SP150').value)||0},
+    SP200: {stockLen: parseFloat(document.getElementById('stockLen_SP200').value)||6500, bundle: 1, inStock: parseInt(document.getElementById('inStock_SP200').value)||0}
+  };
+}
+function getKerf(){ return document.getElementById('kerfEnabled').checked ? (parseFloat(document.getElementById('kerf').value)||0) : 0; }
+function getMinOffcut(){ return parseFloat(document.getElementById('minOffcut').value)||0; }
+
+// ---------------- BIN PACKING (per-bar exact subset-sum fill) ----------------
+// Instead of spreading pieces evenly across bars (classic Best-Fit, which
+// leaves every bar with some leftover), this fills ONE bar as close to
+// completely full as possible — searching every combination of remaining
+// pieces, not just "biggest piece first" — then moves on to the next bar
+// with whatever's left. That concentrates the unavoidable waste into as few
+// bars as possible instead of a little bit of slack on every bar, which is
+// how an experienced cutter plans it by hand (and catches swaps like
+// "drop one long piece, use two shorter ones instead" that a pure greedy
+// pass would miss).
+function packBars(pieces, stockLen, kerf){
+  const capacity = Math.floor(stockLen + 1e-6);
+  // Guard against pathological inputs (huge stock lengths or very large
+  // piece counts) where the exact search would be too heavy for the
+  // browser — fall back to a fast best-fit pass in that case.
+  if(capacity > 200000 || pieces.length > 600){
+    return packBarsBestFit(pieces, stockLen, kerf);
+  }
+
+  let remaining = [...pieces].sort((a,b)=> b.length - a.length);
+  const bars = [];
+  const blocked = [];
+
+  remaining = remaining.filter(p=>{
+    if(p.length + kerf > stockLen + 1e-9){ blocked.push(p); return false; }
+    return true;
+  });
+
+  while(remaining.length){
+    const chosenIdx = bestFillForBar(remaining, capacity, kerf); // indices, sorted descending
+    const barPieces = [];
+    let used = 0;
+    chosenIdx.forEach(idx=>{
+      const p = remaining[idx];
+      barPieces.push(p);
+      used += p.length + kerf;
+    });
+    chosenIdx.forEach(idx=> remaining.splice(idx,1));
+    barPieces.sort((a,b)=> b.length - a.length);
+    bars.push({pieces: barPieces, used});
+  }
+
+  bars.forEach(b=> b.remainder = Math.max(0, stockLen - b.used));
+  return {bars, blocked};
+}
+
+// Finds the combination of items (by index) that fills one bar as close to
+// `capacity` as possible, via an exact 0/1 subset-sum search (dynamic
+// programming over achievable lengths in mm). Workshop cut lists are small
+// enough — tens to a few hundred pieces — that this runs instantly.
+function bestFillForBar(items, capacity, kerf){
+  const n = items.length;
+  const reachable = new Uint8Array(capacity+1);
+  const itemUsedAt = new Int32Array(capacity+1).fill(-1);
+  const prevAt = new Int32Array(capacity+1).fill(-1);
+  reachable[0] = 1;
+
+  for(let i=0;i<n;i++){
+    const cost = Math.round(items[i].length + kerf);
+    if(cost > capacity || cost <= 0) continue;
+    for(let s=capacity; s>=cost; s--){
+      if(!reachable[s] && reachable[s-cost]){
+        reachable[s] = 1;
+        itemUsedAt[s] = i;
+        prevAt[s] = s - cost;
+      }
+    }
+  }
+
+  let best = 0;
+  for(let s=capacity; s>=0; s--){ if(reachable[s]){ best = s; break; } }
+
+  const chosen = [];
+  let s = best;
+  while(s > 0 && itemUsedAt[s] !== -1){
+    chosen.push(itemUsedAt[s]);
+    s = prevAt[s];
+  }
+  chosen.sort((a,b)=> b-a); // descending so splice-removal by index is safe
+  return chosen;
+}
+
+// Fallback used only for very large jobs — the original Best-Fit-Decreasing
+// pass. Faster but spreads leftover material more evenly across bars rather
+// than concentrating it, so it's a last resort rather than the default.
+function packBarsBestFit(pieces, stockLen, kerf){
+  const sorted = [...pieces].sort((a,b)=> b.length - a.length);
+  const bars = [];
+  const blocked = [];
+  sorted.forEach(p=>{
+    const cost = p.length + kerf;
+    if(cost > stockLen + 1e-9){ blocked.push(p); return; }
+    let bestBar = null, bestRemain = Infinity;
+    for(const bar of bars){
+      const remain = stockLen - bar.used;
+      if(remain >= cost - 1e-9 && remain < bestRemain){ bestBar = bar; bestRemain = remain; }
+    }
+    if(bestBar){ bestBar.pieces.push(p); bestBar.used += cost; }
+    else bars.push({pieces:[p], used: cost});
+  });
+  bars.forEach(b=> b.remainder = Math.max(0, stockLen - b.used));
+  return {bars, blocked};
+}
+
+function runCalculation(){
+  const cfg = getBundleConfig();
+  const kerf = getKerf();
+  const minOffcut = getMinOffcut();
+
+  const demand = {A:[], B:[], Ja:[], Jb:[], Z:[], SP150:[], SP200:[]};
+  const fulfilRows = [];
+  const blockedRows = [];
+
+  const cards = document.getElementById('orderBody').children;
+  if(cards.length===0){ alert('Add at least one cut line first.'); return; }
+
+  Array.from(cards).forEach((card,i)=>{
+    const type = card.querySelector('.typefield').value;
+    const length = parseFloat(card.querySelector('.lenfield').value)||0;
+    const qty = parseInt(card.querySelector('.qtyfield').value)||0;
+    if(length<=0 || qty<=0) return;
+    const label = `Line ${i+1}`;
+    // jobLabel only matters for Streetplates — it's what gets written on the
+    // cut diagram next to the dimension, and keeps differently-named plate
+    // jobs from being silently merged together even if they share a length.
+    // For struts it stays a constant empty string so identical-length pieces
+    // from different lines still compress into one diagram card as before.
+    const jobLabel = STREETPLATE_TYPES.includes(type) ? (card.querySelector('.labelfield')?.value.trim() || '') : '';
+
+    let feedsInto = '';
+    if(type==='A'){ demand.A.push({length,qty,label,jobLabel:''}); feedsInto = `${qty}x A-Strut @ ${length}mm`; }
+    else if(type==='B'){ demand.B.push({length,qty,label,jobLabel:''}); feedsInto = `${qty}x B-Strut @ ${length}mm`; }
+    else if(type==='AJ'){ demand.Ja.push({length,qty,label,jobLabel:''}); demand.Z.push({length,qty,label,jobLabel:''}); feedsInto = `${qty}x J-aStrut + ${qty}x Z-Strut @ ${length}mm`; }
+    else if(type==='BJ'){ demand.Jb.push({length,qty,label,jobLabel:''}); demand.Z.push({length,qty,label,jobLabel:''}); feedsInto = `${qty}x J-bStrut + ${qty}x Z-Strut @ ${length}mm`; }
+    else if(type==='SP150'){ demand.SP150.push({length,qty,label,jobLabel}); feedsInto = `${qty}x 150 Streetplates${jobLabel?` "${jobLabel}"`:''} @ ${length}mm`; }
+    else if(type==='SP200'){ demand.SP200.push({length,qty,label,jobLabel}); feedsInto = `${qty}x 200 Streetplates${jobLabel?` "${jobLabel}"`:''} @ ${length}mm`; }
+
+    fulfilRows.push({type, length, qty, feedsInto, jobLabel});
+  });
+
+  const packed = {};
+  const colorMaps = {};
+  Object.keys(demand).forEach(typeKey=>{
+    const pieces = [];
+    demand[typeKey].forEach(d=>{ for(let i=0;i<d.qty;i++) pieces.push({length:d.length, label:d.label, jobLabel:d.jobLabel||''}); });
+    const stockLen = cfg[typeKey].stockLen;
+    const result = packBars(pieces, stockLen, kerf);
+    packed[typeKey] = result;
+    result.blocked.forEach(p=> blockedRows.push({type:typeKey, length:p.length, qty:1, label:p.label, reason:`Piece length + kerf (${(p.length+kerf)}mm) exceeds stock length (${stockLen}mm) for ${TYPE_INFO[typeKey].label}.`}));
+
+    // Count how many total pieces share each job label, then walk the bars
+    // in the same order they'll be drawn and stamp each labeled piece with
+    // "N of Total" — e.g. the 2nd of 4 Shearwater Way pieces gets "2/4",
+    // even if the 4 pieces end up spread across different bars/cards.
+    const labelTotals = {};
+    pieces.forEach(p=>{ if(p.jobLabel) labelTotals[p.jobLabel] = (labelTotals[p.jobLabel]||0)+1; });
+    const labelRunning = {};
+    result.bars.forEach(bar=> bar.pieces.forEach(p=>{
+      if(p.jobLabel){
+        labelRunning[p.jobLabel] = (labelRunning[p.jobLabel]||0)+1;
+        p.labelIndex = labelRunning[p.jobLabel];
+        p.labelTotal = labelTotals[p.jobLabel];
+      }
+    }));
+
+    const colorMap = {};
+    let colorIdx = 0;
+    result.bars.forEach(bar=> bar.pieces.forEach(p=>{
+      if(!(p.length in colorMap)){ colorMap[p.length] = COLORS[colorIdx % COLORS.length]; colorIdx++; }
+    }));
+    colorMaps[typeKey] = colorMap;
+  });
+
+  // merge blocked rows with same type+length+label
+  const blockedMerged = {};
+  blockedRows.forEach(b=>{
+    const key = b.type+'|'+b.length+'|'+b.label;
+    if(!blockedMerged[key]){ blockedMerged[key] = {...b, qty:0}; }
+    blockedMerged[key].qty += 1;
+  });
+  const blockedList = Object.values(blockedMerged);
+
+  // -------- render blocked --------
+  const blockedSection = document.getElementById('blockedSection');
+  const blockedBody = document.getElementById('blockedBody');
+  blockedBody.innerHTML = '';
+  if(blockedList.length){
+    blockedSection.style.display = 'block';
+    blockedList.forEach(b=>{
+      blockedBody.innerHTML += `<tr><td>${b.label}</td><td><span class="pill ${TYPE_INFO[b.type].pillClass}">${TYPE_INFO[b.type].label}</span></td><td>${b.length}mm</td><td>${b.qty}</td><td>${b.reason}</td></tr>`;
+    });
+  } else {
+    blockedSection.style.display = 'none';
+  }
+
+  // -------- render job breakdown --------
+  const fulfilBody = document.getElementById('fulfilBody');
+  fulfilBody.innerHTML = fulfilRows.map(r=> `<tr><td><span class="pill ${ORDER_TYPE_INFO[r.type].pillClass}">${ORDER_TYPE_INFO[r.type].label}</span>${r.jobLabel?` <b>${r.jobLabel}</b>`:''}</td><td>${r.length}mm</td><td>${r.qty}</td></tr>`).join('') ||
+    '<tr><td colspan="3" class="empty-hint">No valid cut lines entered.</td></tr>';
+
+  // -------- bundle purchase summary + stats --------
+  const bundleBody = document.getElementById('bundleBody');
+  bundleBody.innerHTML = '';
+  let totalBundles=0, totalBundlesUsed=0, totalBars=0, totalSpare=0;
+  const usableOffcuts = {}; // key type|size -> count
+  let totalScrapLen = 0, totalUsableOffcutCount = 0;
+  const typeCalc = {}; // typeKey -> {barsUsed, bundleSize, stockAvail, barsFromStock, barsFromNew, bundlesToBuy, piecesPurchased, spare}
+
+  Object.keys(TYPE_INFO).forEach(typeKey=>{
+    const info = TYPE_INFO[typeKey];
+    const bars = packed[typeKey].bars;
+    const barsUsed = bars.length;
+    const bundleSize = cfg[typeKey].bundle;
+    const stockAvail = cfg[typeKey].inStock;
+    const barsFromStock = Math.min(barsUsed, stockAvail);
+    const barsFromNew = barsUsed - barsFromStock;
+    const bundlesToBuy = barsFromNew>0 ? Math.ceil(barsFromNew/bundleSize) : 0;
+    const bundlesUsed = barsUsed>0 ? Math.ceil(barsUsed/bundleSize) : 0;
+    const piecesPurchased = bundlesToBuy*bundleSize;
+    const spare = (stockAvail + piecesPurchased) - barsUsed;
+
+    typeCalc[typeKey] = {barsUsed, bundleSize, stockAvail, barsFromStock, barsFromNew, bundlesToBuy, bundlesUsed, piecesPurchased, spare};
+
+    totalBundles += bundlesToBuy;
+    totalBundlesUsed += bundlesUsed;
+    totalBars += barsUsed;
+    totalSpare += Math.max(0, spare);
+
+    bars.forEach(bar=>{
+      if(bar.remainder >= minOffcut){
+        const key = typeKey+'|'+Math.round(bar.remainder);
+        if(!usableOffcuts[key]) usableOffcuts[key] = {type:typeKey, size:Math.round(bar.remainder), count:0};
+        usableOffcuts[key].count++;
+        totalUsableOffcutCount++;
+      } else {
+        totalScrapLen += bar.remainder;
+      }
+    });
+
+    if(barsUsed>0){
+      const needsBuying = bundlesToBuy>0;
+      bundleBody.innerHTML += `<tr class="${needsBuying?'row-needs-buy':'row-covered'}">
+        <td><span class="pill ${info.pillClass}">${info.label}</span></td>
+        <td class="num big-num ${needsBuying?'flag-buy':'flag-ok'}">${bundlesToBuy}${needsBuying?'':' <span class="ok-tag">✓ covered</span>'}</td>
+        <td class="num big-num-secondary">${Math.max(0,spare)}</td>
+      </tr>`;
+    }
+  });
+
+  if(bundleBody.innerHTML===''){
+    bundleBody.innerHTML = '<tr><td colspan="3" class="empty-hint">Nothing to cut yet.</td></tr>';
+  } else {
+    bundleBody.innerHTML += `<tr class="row-total">
+      <td>TOTAL</td>
+      <td class="num big-num">${totalBundles}</td>
+      <td class="num big-num-secondary">${totalSpare}</td>
+    </tr>`;
+  }
+
+  document.getElementById('summaryStats').innerHTML = `
+    <div class="stat"><div class="num-big">${totalBars}</div><div class="lbl">Bars Used</div></div>
+    <div class="stat"><div class="num-big">${totalBundlesUsed}</div><div class="lbl">Bundles Used</div></div>
+    <div class="stat good"><div class="num-big">${totalSpare}</div><div class="lbl">Spare Full Lengths</div></div>
+    <div class="stat"><div class="num-big">${totalBundles}</div><div class="lbl">Bundles To Buy</div></div>
+    <div class="stat good"><div class="num-big">${totalUsableOffcutCount}</div><div class="lbl">Usable Offcuts</div></div>
+  `;
+
+  // -------- offcut summary table --------
+  const offcutBody = document.getElementById('offcutSummaryBody');
+  const offcutList = Object.values(usableOffcuts).sort((a,b)=> a.type.localeCompare(b.type) || b.size-a.size);
+  let rowsHtml = offcutList.map(o=> `<tr><td><span class="pill ${TYPE_INFO[o.type].pillClass}">${TYPE_INFO[o.type].label}</span></td><td class="sizecell">${o.size}mm</td><td>${o.count}</td><td class="status-keep">Usable — keep</td></tr>`).join('');
+  if(totalScrapLen>0){
+    rowsHtml += `<tr><td>—</td><td class="sizecell">&lt; ${minOffcut}mm (various)</td><td>—</td><td class="status-scrap">Scrap — ${Math.round(totalScrapLen).toLocaleString()}mm total binned</td></tr>`;
+  }
+  offcutBody.innerHTML = rowsHtml || '<tr><td colspan="4" class="empty-hint">No offcuts yet.</td></tr>';
+
+  // -------- order note --------
+  const toBuyBits = [];
+  const coveredBits = [];
+  Object.keys(TYPE_INFO).forEach(typeKey=>{
+    const c = typeCalc[typeKey];
+    if(!c || c.barsUsed===0) return;
+    if(c.bundlesToBuy>0){
+      toBuyBits.push(`<b>${c.bundlesToBuy} bundle${c.bundlesToBuy!==1?'s':''}</b> of ${TYPE_INFO[typeKey].label}`);
+    } else {
+      coveredBits.push(TYPE_INFO[typeKey].label);
+    }
+  });
+
+  let noteHTML;
+  if(toBuyBits.length>0 && coveredBits.length>0){
+    noteHTML = `To complete this job you'll need to buy: ${toBuyBits.join(', ')}. ${coveredBits.join(', ')} ${coveredBits.length===1?'is':'are'} already fully covered by stock on hand. See the step-by-step cutting instructions for each strut type below.`;
+  } else if(toBuyBits.length>0){
+    noteHTML = `To complete this job you'll need to buy: ${toBuyBits.join(', ')}. See the step-by-step cutting instructions for each strut type below.`;
+  } else if(coveredBits.length>0){
+    noteHTML = `Nothing to buy — ${coveredBits.join(', ')} ${coveredBits.length===1?'is':'are'} fully covered by stock on hand. See the step-by-step cutting instructions for each strut type below.`;
+  } else {
+    noteHTML = 'Enter cut lines above and press Calculate.';
+  }
+  document.getElementById('orderNote').innerHTML = noteHTML;
+
+  // -------- cut diagrams per type --------
+  const cutSections = document.getElementById('cutSections');
+  cutSections.innerHTML = '';
+  Object.keys(TYPE_INFO).forEach(typeKey=>{
+    const bars = packed[typeKey].bars;
+    if(bars.length===0) return;
+    const info = TYPE_INFO[typeKey];
+    const stockLen = cfg[typeKey].stockLen;
+    const bundleSize = cfg[typeKey].bundle;
+    const c = typeCalc[typeKey];
+
+    const section = document.createElement('div');
+    section.className = `panel type-panel ${typeKey.toLowerCase()} ${info.bundled ? 'bundled-type' : 'unbundled-type'}`;
+
+    // Figure out if every piece cut for this type is the same length —
+    // if so we can give one plain-English sentence instead of a bullet list.
+    const lengthSet = new Set();
+    bars.forEach(bar=> bar.pieces.forEach(p=> lengthSet.add(p.length)));
+    const uniformLength = lengthSet.size===1 ? [...lengthSet][0] : null;
+
+    let summaryHTML = '';
+    if(info.bundled){
+      if(uniformLength!==null){
+        const L = uniformLength;
+        const sentenceParts = [];
+        if(c.barsFromStock>0){
+          const fullBundlesStock = Math.floor(c.barsFromStock/bundleSize);
+          const remBarsStock = c.barsFromStock % bundleSize;
+          if(fullBundlesStock>0){
+            sentenceParts.push(`cut ${fullBundlesStock} bundle${fullBundlesStock!==1?'s':''} of ${info.label} already in stock down to ${L}mm`);
+          }
+          if(remBarsStock>0){
+            sentenceParts.push(`cut ${remBarsStock} bar${remBarsStock!==1?'s':''} from stock down to ${L}mm`);
+          }
+        }
+        const fullBundles = Math.floor(c.barsFromNew/bundleSize);
+        const remBars = c.barsFromNew % bundleSize;
+        if(fullBundles>0){
+          sentenceParts.push(`cut ${fullBundles} bundle${fullBundles!==1?'s':''} of ${info.label} down to ${L}mm`);
+        }
+        if(remBars>0){
+          const spareHere = bundleSize - remBars;
+          sentenceParts.push(`cut ${remBars} bar${remBars!==1?'s':''} down to ${L}mm, saving ${spareHere} full length${spareHere!==1?'s':''} of ${stockLen}mm`);
+        }
+        let sentence = sentenceParts.join(', then ');
+        sentence = sentence.charAt(0).toUpperCase()+sentence.slice(1)+'.';
+        summaryHTML = `<div class="cut-summary">${sentence}</div>`;
+      } else {
+        const steps = [];
+        if(c.barsFromStock>0){
+          const fullBundlesStock = Math.floor(c.barsFromStock/bundleSize);
+          const remBarsStock = c.barsFromStock % bundleSize;
+          if(fullBundlesStock>0){
+            steps.push(`Use <b>${fullBundlesStock}</b> bundle${fullBundlesStock!==1?'s':''} (${fullBundlesStock*bundleSize} full lengths) already in stock first.`);
+          }
+          if(remBarsStock>0){
+            steps.push(`Use <b>${remBarsStock}</b> more full length${remBarsStock!==1?'s':''} from stock.`);
+          }
+        }
+        for(let b=1; b<=c.bundlesToBuy; b++){
+          const piecesUsed = Math.min(bundleSize, c.barsFromNew - (b-1)*bundleSize);
+          const spareInBundle = bundleSize - piecesUsed;
+          if(spareInBundle<=0){
+            steps.push(`Open <b>bundle ${b}</b>: cut all ${bundleSize} pieces (see diagrams below for exact lengths).`);
+          } else {
+            steps.push(`Open <b>bundle ${b}</b>: cut ${piecesUsed} of the ${bundleSize} pieces — ${spareInBundle} full length${spareInBundle!==1?'s':''} left over, save for next job.`);
+          }
+        }
+        if(c.bundlesToBuy===0 && c.barsFromStock>0){
+          steps.push(`Nothing to buy — fully covered by stock on hand.`);
+        }
+        summaryHTML = `<ol class="steps-list">${steps.map(s=>`<li>${s}</li>`).join('')}</ol>`;
+      }
+    } else {
+      // Streetplates — cut individually, no bundle concept at all.
+      if(uniformLength!==null){
+        const L = uniformLength;
+        const parts = [];
+        if(c.barsFromStock>0) parts.push(`cut ${c.barsFromStock} full length${c.barsFromStock!==1?'s':''} already in stock down to ${L}mm`);
+        if(c.barsFromNew>0) parts.push(`cut ${c.barsFromNew} new full length${c.barsFromNew!==1?'s':''} down to ${L}mm`);
+        let sentence = parts.length ? parts.join(', then ') : 'Nothing to cut';
+        sentence = sentence.charAt(0).toUpperCase()+sentence.slice(1)+'.';
+        summaryHTML = `<div class="cut-summary">${sentence}</div>`;
+      } else {
+        const steps = [];
+        if(c.barsFromStock>0) steps.push(`Use <b>${c.barsFromStock}</b> full length${c.barsFromStock!==1?'s':''} already in stock (see diagrams below for exact lengths).`);
+        if(c.barsFromNew>0) steps.push(`Buy and cut <b>${c.barsFromNew}</b> new full length${c.barsFromNew!==1?'s':''} (see diagrams below for exact lengths).`);
+        if(c.barsFromStock===0 && c.barsFromNew===0) steps.push(`Nothing to cut.`);
+        summaryHTML = `<ol class="steps-list">${steps.map(s=>`<li>${s}</li>`).join('')}</ol>`;
+      }
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'bar-grid';
+    const groups = buildBarGroups(bars, c.barsFromStock, bundleSize, info.bundled);
+    groups.forEach(g=>{
+      grid.appendChild(buildGroupCard(g, stockLen, kerf, minOffcut, colorMaps[typeKey], bundleSize));
+    });
+
+    const countLabel = info.bundled
+      ? `${c.bundlesToBuy} bundle${c.bundlesToBuy!==1?'s':''} to buy`
+      : `${c.barsFromNew} new length${c.barsFromNew!==1?'s':''} to buy`;
+    section.innerHTML = `<div class="panel-head"><h2>${info.label} Cutting Plan</h2><span class="count">${countLabel}</span></div>
+      <div class="panel-body">${summaryHTML}</div>`;
+    section.querySelector('.panel-body').appendChild(grid);
+    cutSections.appendChild(section);
+  });
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+  saveState();
+}
+
+const VB_W = 1000, VB_H = 170;
+
+function svgWrap(inner, H){
+  H = H || VB_H;
+  return `<svg width="100%" viewBox="0 0 ${VB_W} ${H}" style="background:#F0F2F3;border:1px solid var(--line);border-radius:6px;display:block;">${inner}</svg>`;
+}
+function wasteHatch(x,y,w,h){
+  if(w<1||h<1) return '';
+  const id = 'hatch'+Math.random().toString(36).slice(2,8);
+  return `<defs><pattern id="${id}" patternUnits="userSpaceOnUse" width="14" height="14" patternTransform="rotate(45)">
+      <rect width="14" height="14" fill="#FBE7E3"/><line x1="0" y1="0" x2="0" y2="14" stroke="#C4432B" stroke-width="5"/>
+    </pattern></defs><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#${id})" stroke="#C7CDD1" stroke-width="1.5"/>`;
+}
+
+// Coordinates are normalized to a fixed VB_W x VB_H box regardless of the
+// real stock length in mm, so text is always a legible, consistent size on
+// screen — a 6500mm bar and a 600mm bar both render with the same clarity.
+const STREET_ABBREV = {
+  drive:'Dr', avenue:'Av', boulevard:'Bvd', road:'Rd', street:'St', lane:'Ln',
+  court:'Ct', place:'Pl', crescent:'Cres', terrace:'Tce', close:'Cl',
+  grove:'Gr', parade:'Pde', circuit:'Cct', highway:'Hwy', entrance:'Ent',
+  approach:'App', esplanade:'Esp', square:'Sq', gardens:'Gdns', heights:'Hts',
+  crossing:'Xing', promenade:'Prom'
+};
+
+// Shortens common street-type suffixes (Drive -> Dr, Avenue -> Av, etc.) so
+// labels fit in the narrow boxes of a busy cut diagram without needing to
+// shrink the font down to unreadable sizes.
+function abbreviateStreetName(name){
+  const words = name.trim().split(/\s+/);
+  if(words.length < 2) return name;
+  const last = words[words.length-1];
+  const key = last.toLowerCase().replace(/[^a-z]/g,'');
+  if(STREET_ABBREV[key]){
+    words[words.length-1] = STREET_ABBREV[key];
+    return words.join(' ');
+  }
+  return name;
+}
+
+// Picks the largest font size that fits the text in maxWidth; if even the
+// minimum legible size doesn't fit, truncates the text with an ellipsis
+// rather than shrinking further into unreadable territory.
+function fitText(text, maxWidth, maxFont, minFont, charWidthFactor){
+  let fontSize = Math.min(maxFont, maxWidth/(text.length*charWidthFactor));
+  if(fontSize < minFont){
+    fontSize = minFont;
+    const maxChars = Math.max(1, Math.floor(maxWidth/(minFont*charWidthFactor)));
+    if(text.length > maxChars){
+      text = maxChars<=1 ? text.slice(0,1) : text.slice(0, maxChars-1)+'…';
+    }
+  }
+  return {text, fontSize};
+}
+
+function buildBarSVGInner(pieces, stockLen, kerf, minOffcut, colorMap, H){
+  H = H || VB_H;
+  const scale = VB_W/stockLen;
+  let inner = '';
+  let cursorMM = 0;
+  // Running list of physical cut positions (mm from the left/reference end
+  // of the stock), used to draw the cumulative measurement strip below the
+  // bar. Starts with the 0 reference point itself.
+  const cutPoints = [{mm:0, isRef:true}];
+
+  pieces.forEach((p, idx)=>{
+    const x = cursorMM*scale;
+    const w = p.length*scale;
+    const fill = colorMap[p.length] || '#7FB3D5';
+    inner += `<rect x="${x.toFixed(1)}" y="0" width="${w.toFixed(1)}" height="${H}" fill="${fill}" stroke="#1F2428" stroke-width="2.5"/>`;
+
+    const hasLabel = !!p.jobLabel;
+
+    // Badge geometry is worked out up front so the piece number/label below
+    // can be sized and positioned to clear it — previously a narrow piece
+    // (e.g. a lone "700") could land its number directly under the badge
+    // circle, blacking out the leading digit.
+    const showBadge = w > 70;
+    const bx = hasLabel ? (x+w/2) : (x+32);
+    const by = hasLabel ? 20 : Math.min(32, H*0.28);
+    const br = hasLabel ? 17 : Math.min(26, H*0.24);
+    const bFont = hasLabel ? 19 : Math.min(28, H*0.26);
+    const badgeBottom = by + br;
+
+    if(hasLabel){
+      const availWidth = w*0.9;
+      const shortLabel = abbreviateStreetName(p.jobLabel);
+      const showCount = p.labelTotal>1;
+      const labelFit = fitText(shortLabel, availWidth, 26, 13, 0.56);
+      const dimFit = fitText(p.length+'mm', availWidth, showCount?30:34, 15, 0.62);
+      const labelY = Math.max(showCount ? H/2-10 : H/2+2, showBadge ? badgeBottom+labelFit.fontSize*0.8 : 0);
+      const dimY = labelY + (showCount ? 34 : 36);
+      inner += `<text x="${(x+w/2).toFixed(1)}" y="${labelY}" text-anchor="middle" font-family="Oswald, sans-serif" font-size="${labelFit.fontSize.toFixed(0)}" fill="#1F2428" font-weight="700">${escapeXML(labelFit.text)}</text>`;
+      inner += `<text x="${(x+w/2).toFixed(1)}" y="${dimY}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="${dimFit.fontSize.toFixed(0)}" fill="#1F2428" font-weight="700">${dimFit.text}</text>`;
+      if(showCount){
+        const countText = `${p.labelIndex}/${p.labelTotal}`;
+        const countFit = fitText(countText, availWidth, 22, 12, 0.58);
+        inner += `<text x="${(x+w/2).toFixed(1)}" y="${dimY+32}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="${countFit.fontSize.toFixed(0)}" fill="#E0570F" font-weight="700">${escapeXML(countFit.text)}</text>`;
+      }
+    } else {
+      // Plain number: cap the font size to whatever vertical room is left
+      // below the badge, and push the baseline down to clear it. This is
+      // what stops the badge circle covering part of the number on narrow
+      // pieces.
+      let fontSize = Math.min(H*0.62, Math.max(H*0.32, w*0.32));
+      if(showBadge){
+        const availBelowBadge = H - badgeBottom - 4;
+        fontSize = Math.min(fontSize, Math.max(11, availBelowBadge/0.85));
+      }
+      let textY = H/2 + fontSize*0.32;
+      if(showBadge) textY = Math.max(textY, badgeBottom + fontSize*0.82);
+      textY = Math.min(textY, H-3);
+      inner += `<text x="${(x+w/2).toFixed(1)}" y="${textY.toFixed(1)}" text-anchor="middle" font-family="Oswald, sans-serif" font-size="${fontSize.toFixed(0)}" fill="#1F2428" font-weight="700">${p.length}</text>`;
+    }
+
+    // Badge — which cut number this is, in order along the bar. Drawn last
+    // so it always sits crisply on top of the piece colour; the text above
+    // is now sized/placed so it never sits underneath it.
+    if(showBadge){
+      inner += `<circle cx="${bx.toFixed(1)}" cy="${by}" r="${br}" fill="#1F2428" stroke="#fff" stroke-width="2.5"/>`;
+      inner += `<text x="${bx.toFixed(1)}" y="${by+(bFont*0.32)}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-weight="700" font-size="${bFont}" fill="#fff">${idx+1}</text>`;
+    }
+
+    cursorMM += p.length;
+    cutPoints.push({mm: cursorMM, isRef:false});
+    if(kerf>0){
+      const kx = cursorMM*scale;
+      inner += `<line x1="${kx.toFixed(1)}" y1="0" x2="${kx.toFixed(1)}" y2="${H}" stroke="#1F2428" stroke-width="3" stroke-dasharray="7,5"/>`;
+    }
+    cursorMM += kerf;
+  });
+
+  const remainderMM = Math.max(0, stockLen - cursorMM);
+  const rx = cursorMM*scale, rw = remainderMM*scale;
+  if(remainderMM > 0.5){
+    if(remainderMM >= minOffcut){
+      inner += `<rect x="${rx.toFixed(1)}" y="0" width="${rw.toFixed(1)}" height="${H}" fill="#BFE3CC" stroke="#1F2428" stroke-width="2.5"/>`;
+      const fs = Math.min(H*0.24, Math.max(H*0.11, rw*0.15));
+      inner += `<text x="${(rx+rw/2).toFixed(1)}" y="${H/2+fs*0.32}" text-anchor="middle" font-family="Oswald, sans-serif" font-weight="700" font-size="${fs.toFixed(0)}" fill="#1F5C36">${Math.round(remainderMM)} - OFFCUT</text>`;
+    } else {
+      inner += wasteHatch(rx,0,rw,H);
+      const fs = Math.min(H*0.16, Math.max(H*0.08, rw*0.22));
+      inner += `<text x="${(rx+rw/2).toFixed(1)}" y="${H/2+fs*0.28}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-weight="700" font-size="${fs.toFixed(0)}" fill="#C4432B">${Math.round(remainderMM)}</text>`;
+    }
+  }
+
+  // ---- Cut-mark measurement strip -----------------------------------
+  // A running total, from the left/reference end of the stock, at every
+  // cut point — so the whole bar can be marked out in one pass with a
+  // tape measure instead of re-measuring from the end of the previous
+  // piece each time. Falls back to two staggered rows only where cuts
+  // land close enough together that the numbers would otherwise collide;
+  // most bars only need the one row.
+  const dimFontSize = Math.max(11, Math.min(20, H*0.17));
+  const tickLen = Math.max(6, H*0.15);
+  const rowGap = dimFontSize + 5;
+  const row0Y = H + tickLen + dimFontSize*0.82;
+  const row1Y = row0Y + rowGap;
+  const charW = dimFontSize*0.62;
+
+  const marks = cutPoints.map(cp=>{
+    const label = Math.round(cp.mm).toString();
+    const mx = cp.mm*scale;
+    const halfW = (label.length*charW + 6)/2;
+    return {x: mx, label, halfW, isRef: cp.isRef};
+  });
+  const rowRight = [-Infinity, -Infinity];
+  let usesRow1 = false;
+  marks.forEach(m=>{
+    const row = (m.x - m.halfW) < rowRight[0] + 4 ? 1 : 0;
+    if(row===1) usesRow1 = true;
+    rowRight[row] = m.x + m.halfW;
+    m.row = row;
+  });
+
+  const totalH = (usesRow1 ? row1Y : row0Y) + 6;
+  marks.forEach(m=>{
+    const tickBottom = H + tickLen + (m.row===1 ? rowGap : 0);
+    const labelY = m.row===1 ? row1Y : row0Y;
+    const color = m.isRef ? '#8A929B' : '#E0570F';
+    let anchor='middle', tx=m.x;
+    if(m.x - m.halfW < 2){ anchor='start'; tx=2; }
+    else if(m.x + m.halfW > VB_W-2){ anchor='end'; tx=VB_W-2; }
+    inner += `<line x1="${m.x.toFixed(1)}" y1="${H}" x2="${m.x.toFixed(1)}" y2="${tickBottom.toFixed(1)}" stroke="${m.isRef?'#C7CDD1':'#1F2428'}" stroke-width="2"/>`;
+    inner += `<text x="${tx.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="${anchor}" font-family="JetBrains Mono, monospace" font-weight="700" font-size="${dimFontSize.toFixed(0)}" fill="${color}">${m.label}</text>`;
+  });
+
+  return {inner, remainder: remainderMM, H: totalH};
+}
+
+// Groups consecutive bars that share the exact same cut pattern into single
+// diagram cards. For bundled items (struts), a run is split along physical
+// bundle boundaries since a bundle only ever holds `bundleSize` pieces. For
+// unbundled items (Streetplates — cut individually, no bundle concept), the
+// whole identical-pattern run collapses into a single card no matter how
+// long it is.
+function buildBarGroups(bars, barsFromStock, bundleSize, bundled){
+  const groups = [];
+  let bundleCounter = 1;
+  const defaultChunkSize = bundled ? bundleSize : Infinity;
+
+  function patternKey(bar){ return bar.pieces.map(p=>`${p.length}|${p.jobLabel||''}`).sort().join(','); }
+  // A bar containing a piece from a multi-instance named job (e.g. one of
+  // 4 "Shearwater Way" pieces) must never be compressed into a "×N
+  // identical" card — that would hide which specific instance (1/4, 2/4...)
+  // is shown, since only one representative bar gets drawn per card.
+  function hasNumberedLabel(bar){ return bar.pieces.some(p=>p.labelTotal>1); }
+
+  function processSection(slice, source){
+    let i = 0;
+    while(i < slice.length){
+      const key = patternKey(slice[i]);
+      let runLen = 1;
+      while(i+runLen < slice.length && patternKey(slice[i+runLen])===key) runLen++;
+
+      const chunkSize = hasNumberedLabel(slice[i]) ? 1 : defaultChunkSize;
+
+      let consumed = 0;
+      while(consumed < runLen){
+        const take = Math.min(runLen-consumed, chunkSize);
+        const isFullBundle = bundled && take===bundleSize;
+        groups.push({
+          bar: slice[i+consumed],
+          count: take,
+          isFullBundle,
+          bundled,
+          source,
+          bundleNumber: isFullBundle ? bundleCounter : null
+        });
+        if(isFullBundle) bundleCounter++;
+        consumed += take;
+      }
+      i += runLen;
+    }
+  }
+
+  processSection(bars.slice(0, barsFromStock), 'stock');
+  processSection(bars.slice(barsFromStock), 'new');
+  return groups;
+}
+
+const PRINT_STRUT_VB_H = 42;
+const PRINT_STREETPLATE_VB_H = 128;
+
+function buildGroupCard(g, stockLen, kerf, minOffcut, colorMap, bundleSize){
+  const {inner, H: screenH} = buildBarSVGInner(g.bar.pieces, stockLen, kerf, minOffcut, colorMap);
+  const pieceList = g.bar.pieces.map(p=>p.jobLabel ? `${p.jobLabel} (${p.length}mm)` : `${p.length}mm`).join(' + ');
+  const labelsInGroup = [...new Set(g.bar.pieces.map(p=>p.jobLabel).filter(Boolean))];
+
+  let title, sourceTag;
+  if(!g.bundled){
+    // Streetplates: no bundle concept at all — just plain full lengths.
+    title = `${g.count} Full Length${g.count!==1?'s':''}`;
+    sourceTag = g.source==='stock' ? 'Already in stock' : 'Buy this length';
+  } else if(g.isFullBundle){
+    title = `Bundle ${g.bundleNumber}`;
+    sourceTag = g.source==='stock' ? 'Full bundle already in stock' : 'New bundle — buy this one';
+  } else {
+    title = `${g.count} Loose Full Length${g.count!==1?'s':''}`;
+    sourceTag = g.source==='stock' ? 'Grab from existing stock (not a full bundle)' : 'Spare pieces left in an opened bundle — save for next job';
+  }
+  if(labelsInGroup.length===1){
+    title += ` — ${labelsInGroup[0]}`;
+  }
+
+  // Every card gets its own dedicated, correctly-proportioned print version
+  // — struts very compact (only the number matters), Streetplates only
+  // modestly shorter than on-screen (names still need the room) — rather
+  // than reusing the tall on-screen one, which is what was leaving big
+  // gaps when a card didn't quite fit at the bottom of a page.
+  const printH = g.bundled ? PRINT_STRUT_VB_H : PRINT_STREETPLATE_VB_H;
+  const printResult = buildBarSVGInner(g.bar.pieces, stockLen, kerf, minOffcut, colorMap, printH);
+  const printSvg = svgWrap(printResult.inner, printResult.H);
+
+  const card = document.createElement('div');
+  card.className = 'bar-card';
+  const badgeHTML = g.count>1 ? `<div class="multiplier-badge">&times;${g.count} identical</div>` : '';
+  const bodyHTML = `<div class="cc-body no-print" style="position:relative;">${badgeHTML}${svgWrap(inner, screenH)}</div>
+       <div class="cc-body print-svg-only" style="position:relative;">${badgeHTML}${printSvg}</div>`;
+  card.innerHTML = `
+    <div class="cc-head"><span>${title}</span><span>${sourceTag}</span></div>
+    ${bodyHTML}
+    <div class="legend-note">${g.count>1 ? `All ${g.count} pieces are cut the same way` : 'This piece is cut'} — the numbered circle${g.bar.pieces.length!==1?'s':''} on the diagram show${g.bar.pieces.length===1?'s':''} the cut order — ${g.bar.pieces.length} cut${g.bar.pieces.length!==1?'s':''} from each ${stockLen}mm length: <b>${pieceList}</b>. The small orange numbers below the bar are the running measurement from the left end — mark all of them off the tape in one pass, then cut.</div>
+  `;
+  return card;
+}
+
+// Pick up where the last session left off, if there's a saved job —
+// otherwise start fresh with a single blank row.
+const restored = loadState();
+if(restored) runCalculation();
+
+function updatePrintDate(){
+  const d = new Date();
+  document.getElementById('printDate').textContent = d.toLocaleDateString();
+}
+updatePrintDate();
+window.addEventListener('beforeprint', updatePrintDate);
+
+// Client Name / Job Number are required before printing, and always start
+// blank (no memory of the last entry) so each printout is deliberate.
+function openPrintInfoModal(){
+  document.getElementById('printClientName').value = '';
+  document.getElementById('printJobNumber').value = '';
+  document.getElementById('printModalError').style.display = 'none';
+  document.getElementById('printInfoModal').style.display = 'flex';
+  document.getElementById('printClientName').focus();
+}
+function closePrintInfoModal(){
+  document.getElementById('printInfoModal').style.display = 'none';
+}
+function confirmPrintInfo(){
+  const clientName = document.getElementById('printClientName').value.trim();
+  const jobNumber = document.getElementById('printJobNumber').value.trim();
+  if(!clientName || !jobNumber){
+    document.getElementById('printModalError').style.display = 'block';
+    if(!clientName) document.getElementById('printClientName').focus();
+    else document.getElementById('printJobNumber').focus();
+    return;
+  }
+  document.getElementById('pjbClient').textContent = clientName;
+  document.getElementById('pjbJobNo').textContent = jobNumber;
+  closePrintInfoModal();
+  window.print();
+}
+// Enter moves Client Name -> Job Number -> submits, so the whole thing can
+// be filled out and printed without touching the mouse.
+document.getElementById('printClientName').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ e.preventDefault(); document.getElementById('printJobNumber').focus(); }
+});
+document.getElementById('printJobNumber').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ e.preventDefault(); confirmPrintInfo(); }
+});
+document.getElementById('printInfoModal').addEventListener('click', e=>{
+  if(e.target.id==='printInfoModal') closePrintInfoModal();
+});
+
+</script>
+
+</div><!-- /#appContent -->
+
+</body>
+</html>
